@@ -49,7 +49,7 @@ class EyeD3
      */
     public $ignoredTags = [];
 
-    public function __construct($path="eyeD3", $file)
+    public function __construct($file, $path="eyeD3")
     {
         $this->path = $path;
         $this->file = $file;
@@ -84,7 +84,7 @@ class EyeD3
             $command .= " ".$arg;
         }
         $output = shell_exec($command);
-        print_r($output);
+        //print_r($output);
         $lines = explode("\n", $output);
         $response = [];
         for ($i = 0; $i < count($lines); $i++) {
@@ -140,23 +140,26 @@ class EyeD3
      * @link https://eyed3.readthedocs.io/en/latest/plugins/classic_plugin.html
      * @return array command arguments
      */
-    public function buildArgs($meta)
+    public static function buildArgs($meta)
     {
         $args = [];
         if (array_key_exists("artist", $meta)) {
-            array_push($a, '-a', $meta["artist"]);
+            array_push($a, '-a', "'".$meta["artist"]."'");
         }
         if (array_key_exists("title", $meta)) {
-            array_push($args, '-t', $meta["title"]);
+            array_push($args, '-t', "'".$meta["title"]."'");
         }
         if (array_key_exists("album", $meta)) {
-            array_push($args, '-A', $meta["album"]);
+            array_push($args, '-A', "'".$meta["album"]."'");
         }
         if (array_key_exists("comment", $meta)) {
-            array_push($args, '-c', '::' + $meta["comment"]);
+            array_push($args, '-c', '::'."'".$meta["comment"]."'");
         }
         if (array_key_exists("lyrics", $meta)) {
-            array_push($args, '-L', '::' + $meta["lyrics"]);
+            array_push($args, '-L', '::'."'".$meta["lyrics"]."'");
+        }
+        if (array_key_exists("year", $meta)) {
+            array_push($args, '-Y', $meta["year"]);
         }
         return $args;
     }
@@ -165,16 +168,26 @@ class EyeD3
     /**
     * Update Meta Tags
     *
-    * Update the meta data of the given file
+    * Update the meta data of a file with the given data
     *
-    * @param string  file
+    * @param array  meta
+    * @param callable callback
     */
 
-    public function updateMeta($meta)
+    public function updateMeta($meta, $callback = null)
     {
-
+        $file = $this->file;
+        $args = self::buildArgs($meta);
+        array_push($args, $file);
+        $command = $this->path;
+        foreach ($args as $arg) {
+            $command .= " ".$arg;
+        }
+        $output = shell_exec($command);
+        print($output);
+        // Execute callback
+        if ($callback) {
+            call_user_func($callback);
+        }
     }
 }
-
-$eyed3 = new EyeD3("../tests/assets/test.mp3");
-$eyed3->readMeta("../tests/assets/test1.mp3");
