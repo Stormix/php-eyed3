@@ -22,7 +22,7 @@ class EyeD3Test extends \PHPUnit\Framework\TestCase
   */
     public function testIsThereAnySyntaxError()
     {
-        $var = new Stormiix\EyeD3\EyeD3("assets/test.mp3");
+        $var = new Stormiix\EyeD3\EyeD3("tests/assets/test.mp3");
         $this->assertTrue(is_object($var));
         unset($var);
     }
@@ -47,6 +47,7 @@ class EyeD3Test extends \PHPUnit\Framework\TestCase
         $expected = "TestArtistChanged";
         $var->updateMeta(["artist"=>$expected]);
         $this->assertTrue($var->readMeta()["artist"] == $expected);
+        $var->updateMeta(["artist"=>"TestArtist"]);// roll back the changes
         unset($var);
     }
 }
