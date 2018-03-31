@@ -1,5 +1,8 @@
 language: php
 
+before_install:
+  - sudo apt-get install eyed3
+
 php:
     - 7.0
     - 7.1
