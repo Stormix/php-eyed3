@@ -76,7 +76,8 @@ class EyeD3
     {
         $this->path = $path;
         $this->file = $file;
-        $this->faultyTags = ['track','comment','lyrics'];
+		// I only updated this because I faced the same problem  with these tags on another system.
+        $this->faultyTags = ['track','comment','lyrics','artist','title','album','tags'];
         $this->ignoredTags = ['usertextframe'];
         $this->verbose = $verbose;
     }
@@ -134,16 +135,41 @@ class EyeD3
                     // From http://www.xamuel.com/blank-mp3s/
                     if (self::match($this->faultyTags, strtolower($line))) {
                         $tag = explode(":", $matches[1][0])[0];
+						print("-------------".$tag."-----------");
                         if ($tag == "track") {
                             if (strpos($matches[1][0], "genre") !== false) {
                                 $tag = trim(explode(":", $matches[1][0])[1]);
                                 $genreDetails = explode("id", $matches[2][0]);
                                 $value = [
-                                "genre" => trim(substr($genreDetails[0], 0, -3)),
-                                "genre_id" => trim(substr($genreDetails[1], 0, -1))
+									"genre" => trim(substr($genreDetails[0], 0, -3)),
+									"genre_id" => trim(substr($genreDetails[1], 0, -1))
                             ];
                             } else {
                                 $tag = "track";
+                                $value = $matches[2][0];
+                            }
+						// The following block of code is used to fix the problem with 2 tags on the same line
+						// in this case title & artist
+						// tweak this if you find problems with other tags
+						// just copy the whole block below & change "title" to the first tag
+						// and "artist" to the second tag
+                        }elseif($tag == "title"){
+                            if (strpos($matches[1][0], "artist") !== false) {
+                                $tag = trim(explode(":", $matches[1][0])[0]);
+                                $value = trim(substr(trim(explode(":", explode(":", $matches[1][0])[1])[0]),0,-6));
+								$response["artist"] = $matches[2][0];
+                            } else {
+                                $tag = "title";
+                                $value = $matches[2][0];
+                            }
+						// I did the same thing for album & year
+						} elseif($tag == "album"){
+                            if (strpos($matches[1][0], "year") !== false) {
+                                $tag = trim(explode(":", $matches[1][0])[0]);
+                                $value = trim(substr(trim(explode(":", explode(":", $matches[1][0])[1])[0]),0,-6));
+								$response["year"] = $matches[2][0];
+                            } else {
+                                $tag = "album";
                                 $value = $matches[2][0];
                             }
                         } else {
