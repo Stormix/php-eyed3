@@ -135,8 +135,7 @@ class EyeD3
                     // From http://www.xamuel.com/blank-mp3s/
                     if (self::match($this->faultyTags, strtolower($line))) {
                         $tag = explode(":", $matches[1][0])[0];
-						print("-------------".$tag."-----------");
-                        if ($tag == "track") {
+						if ($tag == "track") {
                             if (strpos($matches[1][0], "genre") !== false) {
                                 $tag = trim(explode(":", $matches[1][0])[1]);
                                 $genreDetails = explode("id", $matches[2][0]);
