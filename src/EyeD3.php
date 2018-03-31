@@ -1,29 +1,180 @@
-<?php namespace Stormiix\EyeD3;
+<?php
+
+namespace Stormiix\EyeD3;
 
 /**
-*  A sample class
+*  EyeD3 class
+*   A PHP wrapper for reading and updating ID3 meta data of (e.g.) MP3 files using eyeD3
 *
-*  Use this section to define what this class is doing, the PHPDocumentator will use this
-*  to automatically generate an API documentation using this information.
+*  @author Stormiix <hello@stormix.co>
+*  @package PSR\Stormiix\EyeD3
+*  @license MIT
+*  @version 1.0.0
 *
-*  @author yourname
+*  @TODO updateMeta()
 */
-class EyeD3{
+class EyeD3
+{
 
-   /**  @var string $m_SampleProperty define here what this variable is for, do this for every instance variable */
-   private $m_SampleProperty = '';
+   /**
+    * Path to the eyeD3 cli.
+    * @var string
+    */
 
-  /**
-  * Sample method
-  *
-  * Always create a corresponding docblock for each method, describing what it is for,
-  * this helps the phpdocumentator to properly generator the documentation
-  *
-  * @param string $param1 A string containing the parameter, do this for each parameter to the function, make sure to make it descriptive
-  *
-  * @return string
-  */
-   public function method1($param1){
-			return "Hello World";
-   }
+    public $path = '';
+
+    /**
+     * MP3 file path.
+     * @var string
+     */
+
+    public $file = '';
+
+    /**
+     * faulty tags.
+     *
+     * Some tags are concatenated like: "track: 		genre: Synthpop (id 147)"
+     * and other have their values on a new line
+     * Comment: [Description: ] [Lang: XXX]
+     * From http://www.xamuel.com/blank-mp3s/
+     *
+     * @var array
+     */
+
+    public $faultyTags = [];
+
+    /**
+     * Some tags to ignore.
+     * @var array
+     */
+    public $ignoredTags = [];
+
+    public function __construct($path="eyeD3", $file)
+    {
+        $this->path = $path;
+        $this->file = $file;
+        $this->faultyTags = ['track','comment','lyrics'];
+        $this->ignoredTags = ['usertextframe'];
+    }
+
+    public static function match($needles, $haystack)
+    {
+        foreach ($needles as $needle) {
+            if (strpos($haystack, $needle) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+    * Read Meta Tags
+    *
+    * Reads the meta data of the given file
+    *
+    * @return array tags
+    */
+
+    public function readMeta()
+    {
+        $file = $this->file;
+        $args = ['--no-color', $file];
+        $command = $this->path;
+        foreach ($args as $arg) {
+            $command .= " ".$arg;
+        }
+        $output = shell_exec($command);
+        print_r($output);
+        $lines = explode("\n", $output);
+        $response = [];
+        for ($i = 0; $i < count($lines); $i++) {
+            $line = $lines[$i];
+            if (!self::match($this->ignoredTags, strtolower($line))) {
+                preg_match('/^(.*): (.*)$/', $line, $matches, PREG_OFFSET_CAPTURE);
+                if ($matches) {
+                    // Some tags are concatenated :track: 		genre: Synthpop (id 147)
+                    // and other have their values on a new line
+                    // Comment: [Description: ] [Lang: XXX]
+                    // From http://www.xamuel.com/blank-mp3s/
+                    if (self::match($this->faultyTags, strtolower($line))) {
+                        $tag = explode(":", $matches[1][0])[0];
+                        if ($tag == "track") {
+                            if (strpos($matches[1][0], "genre") !== false) {
+                                $tag = trim(explode(":", $matches[1][0])[1]);
+                                $genreDetails = explode("id", $matches[2][0]);
+                                $value = [
+                                "genre" => trim(substr($genreDetails[0], 0, -3)),
+                                "genre_id" => trim(substr($genreDetails[1], 0, -1))
+                            ];
+                            } else {
+                                $tag = "track";
+                                $value = $matches[2][0];
+                            }
+                        } else {
+                            $value = $lines[$i+1];
+                        }
+                    } else {
+                        $tag = strtolower($matches[1][0]);
+                        $value = $matches[2][0];
+                    }
+                    if (!array_key_exists($tag, $response)) {
+                        $response[$tag] = $value;
+                    } else {
+                        if (!array_key_exists($tag."s", $response)) {
+                            $response[$tag."s"][] = $value;
+                        }
+                        unset($response[$tag]);
+                    }
+                }
+            }
+        }
+        return $response;
+    }
+
+    /**
+     * Builds an argument error out of the given meta data
+     *
+     * Create arguments as described in : https://eyed3.readthedocs.io/en/latest/plugins/classic_plugin.html
+     *
+     * @param array meta
+     * @link https://eyed3.readthedocs.io/en/latest/plugins/classic_plugin.html
+     * @return array command arguments
+     */
+    public function buildArgs($meta)
+    {
+        $args = [];
+        if (array_key_exists("artist", $meta)) {
+            array_push($a, '-a', $meta["artist"]);
+        }
+        if (array_key_exists("title", $meta)) {
+            array_push($args, '-t', $meta["title"]);
+        }
+        if (array_key_exists("album", $meta)) {
+            array_push($args, '-A', $meta["album"]);
+        }
+        if (array_key_exists("comment", $meta)) {
+            array_push($args, '-c', '::' + $meta["comment"]);
+        }
+        if (array_key_exists("lyrics", $meta)) {
+            array_push($args, '-L', '::' + $meta["lyrics"]);
+        }
+        return $args;
+    }
+
+
+    /**
+    * Update Meta Tags
+    *
+    * Update the meta data of the given file
+    *
+    * @param string  file
+    */
+
+    public function updateMeta($meta)
+    {
+
+    }
 }
+
+$eyed3 = new EyeD3("../tests/assets/test.mp3");
+$eyed3->readMeta("../tests/assets/test1.mp3");
