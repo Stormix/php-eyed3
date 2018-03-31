@@ -1,0 +1,24 @@
+{
+    "name": "stormiix/php-eyed3",
+    "description": "A PHP wrapper for reading and updating ID3 meta data of (e.g.) MP3 files using eyeD3",
+    "keywords": ["PHP", "wrapper", "eyeD3"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Anas Mazouni (Stormiix)",
+            "email": "hello@stormix.co"
+        }
+    ],
+    "type": "project",
+    "require": {
+		"php": ">=7.0"
+    },
+	"require-dev": {
+		"phpunit/phpunit": "5.2.*"
+    },
+	"autoload": {
+        "psr-4": {
+            "Stormiix\\EyeD3\\": "src/"
+        }
+    }
+}
