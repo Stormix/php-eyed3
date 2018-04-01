@@ -223,7 +223,7 @@ class EyeD3
             array_push($args, '-Y', $meta["year"]);
         }
         if (array_key_exists("album_art", $meta)){
-            array_push($args, "--remove-all-images","--add-image",$meta["album_art"].":FRONT_COVER");
+            array_push($args,"--add-image",$meta["album_art"].":FRONT_COVER");
         }
         return $args;
     }
