@@ -3,7 +3,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/Stormiix/php-eyed3.svg)](https://github.com/Stormiix/php-eyed3/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Stormiix/php-eyed3.svg?style=flat)](https://github.com/Stormiix/php-eyed3/network)
 [![Build Status](https://img.shields.io/travis/Stormiix/php-eyed3/master.svg?style=flat-square)](https://travis-ci.org/Stormiix/php-eyed3)
-[![Donations Badge](https://stormix.co/donate/images/badge.svg)]({https://stormix.co/donate/})
+[![Donations Badge](https://stormix.co/donate/images/badge.svg)](https://stormix.co/donate/)
 
 A PHP wrapper for reading and updating ID3 meta data of (e.g.) MP3 files using eyeD3
 
