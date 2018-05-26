@@ -112,7 +112,7 @@ class EyeD3
 
     public function readMeta()
     {
-        $file = $this->file;
+        $file = '"'.$this->file.'"';
         $args = ['--no-color', $file];
         $command = $this->path;
         foreach ($args as $arg) {
