@@ -204,25 +204,25 @@ class EyeD3
     public static function buildArgs($meta)
     {
         $args = [];
-        if (array_key_exists("artist", $meta)) {
+        if (array_key_exists("artist", $meta) && $meta["artist"] != "") {
             array_push($args, '-a', '"'.$meta["artist"].'"');
         }
-        if (array_key_exists("title", $meta)) {
+        if (array_key_exists("title", $meta) && $meta["title"] != "") {
             array_push($args, '-t', '"'.$meta["title"].'"');
         }
-        if (array_key_exists("album", $meta)) {
+        if (array_key_exists("album", $meta) && $meta["album"] != "") {
             array_push($args, '-A', '"'.$meta["album"].'"');
         }
-        if (array_key_exists("comment", $meta)) {
+        if (array_key_exists("comment", $meta) && $meta["comment"] != "") {
             array_push($args, '-c', '::'.'"'.$meta["comment"].'"');
         }
-        if (array_key_exists("lyrics", $meta)) {
+        if (array_key_exists("lyrics", $meta) && $meta["lyrics"] != "") {
             array_push($args, '-L', '::'.'"'.$meta["lyrics"].'"');
         }
-        if (array_key_exists("year", $meta)) {
+        if (array_key_exists("year", $meta) && $meta["year"] != "") {
             array_push($args, '-Y', $meta["year"]);
         }
-        if (array_key_exists("album_art", $meta)){
+        if (array_key_exists("album_art", $meta) && $meta["album_art"] != ""){
             array_push($args,"--add-image",$meta["album_art"].":FRONT_COVER");
         }
         return $args;
