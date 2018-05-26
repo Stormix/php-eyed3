@@ -205,19 +205,19 @@ class EyeD3
     {
         $args = [];
         if (array_key_exists("artist", $meta)) {
-            array_push($args, '-a', "'".$meta["artist"]."'");
+            array_push($args, '-a', '"'.$meta["artist"].'"');
         }
         if (array_key_exists("title", $meta)) {
-            array_push($args, '-t', "'".$meta["title"]."'");
+            array_push($args, '-t', '"'.$meta["title"].'"');
         }
         if (array_key_exists("album", $meta)) {
-            array_push($args, '-A', "'".$meta["album"]."'");
+            array_push($args, '-A', '"'.$meta["album"].'"');
         }
         if (array_key_exists("comment", $meta)) {
-            array_push($args, '-c', '::'."'".$meta["comment"]."'");
+            array_push($args, '-c', '::'.'"'.$meta["comment"].'"');
         }
         if (array_key_exists("lyrics", $meta)) {
-            array_push($args, '-L', '::'."'".$meta["lyrics"]."'");
+            array_push($args, '-L', '::'.'"'.$meta["lyrics"].'"');
         }
         if (array_key_exists("year", $meta)) {
             array_push($args, '-Y', $meta["year"]);
@@ -240,13 +240,14 @@ class EyeD3
 
     public function updateMeta($meta, $callback = null)
     {
-        $file = $this->file;
+        $file = '"'.$this->file.'"';
         $args = self::buildArgs($meta);
         array_push($args, $file);
         $command = $this->path;
         foreach ($args as $arg) {
             $command .= " ".$arg;
         }
+	
         $output = shell_exec($command);
         if($this->verbose){
             print_r($output);
